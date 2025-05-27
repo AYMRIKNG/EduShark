@@ -1,0 +1,19 @@
+
+---
+
+# Étapes pour tester ce backend :
+
+1. Télécharge le SDK Npcap :
+  https://npcap.com/#download
+  (Prends le SDK ZIP et installe Npcap).
+  
+  2. Compile avec CMake sur Windows (Visual Studio recommandé).
+  
+  3. Lance le programme en admin (nécessaire pour la capture).
+
+---
+
+Souhaites-tu que je t’ajoute :
+  - une API HTTP (REST ou WebSocket) pour visualiser les paquets en live ?
+  - un affichage frontend comme Wireshark (HTML/JS ou C++) ?
+
