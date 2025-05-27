@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>EduShark - Capture</title>
+  
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    ul { list-style: none; padding: 0; }
+    li { background: #f0f0f0; margin: 5px 0; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
 <body>
   <h1>Paquets capturés</h1>
-  <pre id="output"></pre>
-
-  <script>
-    const { ipcRenderer } = require('electron');
-    const output = document.getElementById('output');
-
-    ipcRenderer.on('packet-data', (event, data) => {
-      output.textContent += data + '\n\n';
-    });
-  </script>
+  <ul id="packets-list"></ul>
+<script src="renderer.js"></script>
 </body>
 </html>

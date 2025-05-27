@@ -1,29 +1,59 @@
+const { app, BrowserWindow, ipcMain } = require('electron');
 const net = require('net');
 
-const client = new net.Socket();
+let mainWindow;
 
-client.connect(12345, '127.0.0.1', () => {
-  console.log('Connecté au serveur C++');
-});
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 800, 
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,       // pour pouvoir utiliser require() dans renderer
+      contextIsolation: false,     // désactivé pour nodeIntegration (pas sécurisé mais simple pour dev)
+    }
+  });
+
+  mainWindow.loadFile('index.html');
+mainWindow.webContents.openDevTools();
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+}
+
+app.whenReady().then(() => {
+  createWindow();
+
+  const client = new net.Socket();
+  client.connect(12345, '127.0.0.1', () => {
+    console.log('Connecté au serveur C++');
+  });
 
 client.on('data', (data) => {
-  // Parfois les données peuvent arriver en morceaux, on peut split par \n
   const packets = data.toString().split('\n').filter(s => s.trim().length > 0);
   packets.forEach(packet => {
     try {
       const json = JSON.parse(packet);
-      console.log('Paquet reçu:', json);
-      // ici tu peux mettre à jour ton UI ou stocker les paquets
-    } catch(e) {
-      console.error('Erreur JSON:', e, 'avec data:', packet);
+      console.log('Envoi au renderer:', json);
+      if (mainWindow) {
+        mainWindow.webContents.send('new-packet', json);
+      }
+    } catch (e) {
+      console.error('Erreur JSON:', e);
     }
   });
 });
 
-client.on('close', () => {
-  console.log('Connexion fermée');
+
+  client.on('error', (err) => {
+    console.error('Erreur client TCP:', err);
+  });
 });
 
-client.on('error', (err) => {
-  console.error('Erreur client TCP:', err);
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate', () => {
+  if (mainWindow === null) createWindow();
 });
